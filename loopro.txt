@@ -1,0 +1,5 @@
+based on the image, what is the next
+action the bot should take to reach its goal? then a single "
+function call, or when starting a new task or subtask, make a plan by
+starting the output with 'plan:'. dont have a plan and a function call. 
+when done with the main task, stop the bot

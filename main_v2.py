@@ -32,8 +32,11 @@ for i in range (5):
             print("Stopping Minecraft AI...")
             stop()
             break
-        print("brain:", response)
-        run(response)
+        if response.startswith("plan:"):
+            pass
+        else:
+            print("brain:", response)
+            run(response)
     except Exception as e:
         print("Error:", e)
         time.sleep(1)

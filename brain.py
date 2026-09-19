@@ -11,15 +11,14 @@ MODEL = "google/gemini-2.5-flash-lite"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 systemprompt = systemprompt
-def is_plan(text):
-    return str(text).strip().lower().startswith("plan:")
+
 
 
 def trim_session(session):
     updated_session = []
     action_count = 0
     for message in reversed(session):
-        if is_plan(message["content"]):
+        if str(message["content"]).startswith("plan:"):
             updated_session.append(message)
         else:
             if action_count < 2:

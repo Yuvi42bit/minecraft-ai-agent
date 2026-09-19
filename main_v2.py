@@ -32,7 +32,8 @@ for i in range (5):
             print("Stopping Minecraft AI...")
             stop()
             break
-        if response.startswith("plan:"):
+        print("brain:", response)
+        if str(response).startswith("plan:"):
             pass
         else:
             print("brain:", response)

@@ -59,7 +59,7 @@ def inventory():
     tap_key('e')
 
 def move_mouse(dx, dy):
-    mouse.move(int(dx), int(dy))
+    mouse.move(int(dx*10), int(dy*10))
 
 def mine():
     mouse.press(Button.left)

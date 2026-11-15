@@ -13,7 +13,7 @@ for i in range(5):
 
 print("Minecraft AI started. k to stop.")
 session = None
-for i in range (5):
+while True:
     try:
         if keyboard.is_pressed('k'):
             print("Stopping Minecraft AI...")

@@ -7,7 +7,7 @@ from getxt import getxt
 api_key = None
 api_key=getxt("apikey.txt")
 
-MODEL = "google/gemini-2.5-flash-lite"
+MODEL = "inclusionai/ling-3.0-flash-vl"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 systemprompt = systemprompt

@@ -1,10 +1,17 @@
 import base64
+import os
 import re
 import requests
+from dotenv import load_dotenv
 from systemprompt import systemprompt
-from getxt import getxt
 
-api_key = getxt("apikey.txt")
+# Load OPENROUTER_API_KEY from the .env file next to this script
+# (a real environment variable with the same name takes priority).
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
+api_key = os.environ.get("OPENROUTER_API_KEY")
+if not api_key:
+    raise SystemExit("OPENROUTER_API_KEY is not set. Put OPENROUTER_API_KEY=your-key "
+                     "in a .env file in the project folder.")
 
 MODEL = "inclusionai/ling-3.0-flash-vl"
 reasoning = "low"  # "none" turns reasoning off; for this model every other level behaves the same

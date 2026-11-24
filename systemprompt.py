@@ -35,7 +35,25 @@ place_or_interact()
 inventory()
     Open or close the inventory (the E key).
 hotbar_navigate(slot_num)
-    Select hotbar slot 1-9 (1 is the leftmost)."""
+    Select hotbar slot 1-9 (1 is the leftmost).
+wait(seconds)
+    Pause for that many seconds (decimals allowed, e.g. wait(0.5)) before the
+    next action in a script. Continuous actions keep going while you wait.
+
+SCRIPTS - several actions in one turn:
+Put actions on ONE line separated by commas. They run in order, one after another,
+and you get the next screenshot only when the whole script has finished.
+    mine(),wait(5),stop()
+        mines for 5 seconds, then stops
+    forward(),jump(),wait(1.5),stop()
+        hops forward onto the next block, then stops
+    move_mouse(600, 0),forward(),wait(3),stop()
+        turns right 90 degrees, walks for 3 seconds, then stops
+Use wait() between starting and stopping something, or it stops straight away.
+End a script with stop() when it started a continuous action, unless you want it
+to keep going into the next turn. You cannot see anything until the script ends,
+so keep scripts short (a few seconds) when you are near cliffs, lava, water or
+mobs, or when aiming needs checking."""
 
 looking_help = """\
 Use move_mouse(dx, dy) to look around and to aim. It is the ONLY way to turn.
@@ -129,9 +147,10 @@ MINECRAFT TIPS
 
 HOW TO REPLY
 Each reply is exactly ONE of these, with no other text and no code formatting:
-1. A single action, written as a function call, e.g. forward() or move_mouse(-300, 0)
+1. An action or a script, written as function calls on one line, e.g. forward()
+   or move_mouse(-300, 0) or mine(),wait(3),stop()
 2. A plan, starting with "plan:", when you start a new task or subtask.
-   A plan may end with one action on its own last line, which will be run.
+   A plan may end with one action or script on its own last line, which will be run.
 3. The word break, only when the whole goal is finished.
 
 MAIN GOAL

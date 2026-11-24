@@ -3,7 +3,7 @@ import time
 
 from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController
-
+from lookup import *
 mouse = MouseController()
 keyboard = KeyboardController()
 
@@ -125,3 +125,6 @@ def hotbar_navigate(slot_num):
     if not 1 <= slot_num <= 9:
         raise ValueError("hotbar slot must be between 1 and 9")
     tap_key(str(slot_num))
+
+def recipes():
+    recipes = recipes

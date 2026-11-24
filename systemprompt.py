@@ -15,6 +15,10 @@ jump()
     Start jumping repeatedly. Use forward() then jump() to climb onto a block.
 mine()
     Start holding left click on the block under the crosshair, until stop().
+    ALWAYS stop() as soon as the block breaks: mining keeps going otherwise,
+    and you will dig into the next block or hit things you didn't mean to.
+    Best as a script, e.g. mine(),wait(3),stop(). If you see the crosshair on
+    air or a broken block while still mining, stop() straight away.
 They stack: forward() then jump() walks forward while jumping.
 Several seconds pass between your turns, so anything you start keeps going
 until you call stop().
@@ -99,19 +103,6 @@ GATHERING
   You need 3 wool, all the same colour, for a bed.
 - Emeralds are found in village chests, or traded from villagers.
 
-CRAFTING (in the inventory or crafting table grid)
-- inventory() opens your 2x2 crafting grid. place_or_interact() on a crafting
-  table opens a 3x3 grid. inventory() closes any menu.
-- In a menu: move_mouse moves the cursor, attack() picks up / puts down a whole
-  stack, place_or_interact() puts down ONE item. Put ingredients in the grid, then
-  attack() the result slot on the right and put the result into your inventory.
-- 1 log -> 4 planks. 2 planks stacked vertically -> 4 sticks.
-- Crafting table: 4 planks in a 2x2 square.
-- Wooden pickaxe: 3 planks across the top row, 2 sticks down the middle (3x3 grid).
-  Stone pickaxe: the same with 3 cobblestone.
-- Chest: 8 planks in a ring (3x3 grid, middle empty).
-- Furnace: 8 cobblestone in a ring (3x3 grid, middle empty).
-- Bed: 3 same-coloured wool on the middle row, 3 planks on the bottom row.
 
 BUILDING
 - Choose the hotbar slot with the block, look at the ground or the side of a

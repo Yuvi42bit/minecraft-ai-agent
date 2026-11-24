@@ -1,0 +1,13 @@
+CRAFTING (in the inventory or crafting table grid)
+- inventory() opens your 2x2 crafting grid. place_or_interact() on a crafting
+  table opens a 3x3 grid. inventory() closes any menu.
+- In a menu: move_mouse moves the cursor, attack() picks up / puts down a whole
+  stack, place_or_interact() puts down ONE item. Put ingredients in the grid, then
+  attack() the result slot on the right and put the result into your inventory.
+- 1 log -> 4 planks. 2 planks stacked vertically -> 4 sticks.
+- Crafting table: 4 planks in a 2x2 square.
+- Wooden pickaxe: 3 planks across the top row, 2 sticks down the middle (3x3 grid).
+  Stone pickaxe: the same with 3 cobblestone.
+- Chest: 8 planks in a ring (3x3 grid, middle empty).
+- Furnace: 8 cobblestone in a ring (3x3 grid, middle empty).
+- Bed: 3 same-coloured wool on the middle row, 3 planks on the bottom row.

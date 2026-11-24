@@ -55,11 +55,14 @@ time.sleep(1)  # give you a moment to close the pause menu
 
 print(f"Minecraft AI started. Press {STOP_KEY} to stop.")
 session = None
+notes = ""  # text from the last script (e.g. recipes()), sent with the next screenshot
 try:
     while not stop_requested:
         try:
             image_bytes = get_frame_bytes()
-            plan, action, session = brain(image_bytes, session, prompty)
+            plan, action, session = brain(image_bytes, session, prompty, notes)
+            if plan is not None or action is not None:
+                notes = ""  # delivered; on an API error keep it for the retry
             if stop_requested:
                 break
 
@@ -80,7 +83,7 @@ try:
                     print(f"Skipped {action}: Minecraft isn't the focused window "
                           f"(focused: {foreground_title()!r}).")
                     continue
-                run(action)
+                notes = run(action)
         except Exception as e:
             print("Error:", e)
             time.sleep(1)

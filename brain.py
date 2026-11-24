@@ -90,20 +90,20 @@ def trim_session(session):
     return [system] + [m for m in rest if id(m) in keep_ids]
 
 
-def brain(image_bytes, session, prompt, api_key=api_key):
+def brain(image_bytes, session, prompt, notes="", api_key=api_key):
     """Returns (plan, action, session). plan/action may be None."""
     if session is None:
         session = [{"role": "system", "content": systemprompt}]
 
     img = base64.b64encode(image_bytes).decode()
 
-    session.append({
-        "role": "user",
-        "content": [
-            {"type": "text", "text": prompt},
-            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img}"}},
-        ],
-    })
+    content = []
+    if notes:
+        # Output of the last script (e.g. recipes()), shown before the screenshot.
+        content.append({"type": "text", "text": "Result of your last action:\n" + notes})
+    content.append({"type": "text", "text": prompt})
+    content.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img}"}})
+    session.append({"role": "user", "content": content})
 
     try:
         response = requests.post(

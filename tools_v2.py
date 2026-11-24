@@ -127,4 +127,5 @@ def hotbar_navigate(slot_num):
     tap_key(str(slot_num))
 
 def recipes():
-    recipes = recipes
+    """Return the crafting guide. The text reaches the AI in its next message."""
+    return RECIPES

@@ -43,6 +43,10 @@ hotbar_navigate(slot_num)
 wait(seconds)
     Pause for that many seconds (decimals allowed, e.g. wait(0.5)) before the
     next action in a script. Continuous actions keep going while you wait.
+recipes()
+    Look up crafting recipes and how to use the crafting grid. The recipes are
+    shown to you in your NEXT message, once only, so copy the ones you need
+    into your next plan. Use it before crafting anything.
 
 SCRIPTS - several actions in one turn:
 Put actions on ONE line separated by commas. They run in order, one after another,

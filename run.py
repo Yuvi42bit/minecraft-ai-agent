@@ -25,8 +25,15 @@ def split_commands(text):
 
 
 def run(text):
+    """Run each command in the script. Returns any text the commands gave back
+    (e.g. from recipes()) plus errors, so the AI can see them next turn."""
+    results = []
     for com in split_commands(text):
         try:
-            eval(com)
+            out = eval(com)
+            if out is not None:
+                results.append(str(out))
         except Exception as exc:
             print(exc)
+            results.append(f"{com} failed: {exc}")
+    return "\n".join(results)

@@ -9,6 +9,8 @@ keyboard = KeyboardController()
 
 TAP_SECONDS = 0.05
 
+def wait(seconds):
+    time.sleep(seconds)
 
 def tap_key(key):
     keyboard.press(key)

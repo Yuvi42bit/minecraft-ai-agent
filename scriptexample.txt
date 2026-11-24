@@ -1,0 +1,2 @@
+mine(),wait(5),stop()
+#mines for 5 seconds

@@ -1,5 +1,3 @@
-based on the image, what is the next
-action the bot should take to reach its goal? then a single "
-function call, or when starting a new task or subtask, make a plan by
-starting the output with 'plan:'. dont have a plan and a function call. 
-when done with the main task, stop the bot
+Here is the latest screenshot. What should the bot do next to reach its goal?
+If what you need is not on screen, look around briefly (at most one circle); if you still don't see it, travel in one direction until you do. Aim with move_mouse so the crosshair (screen center) is on your target before mining or placing.
+Reply with exactly one action as a function call, OR a plan starting with "plan:" if you are starting a new task or subtask, OR break if the whole goal is done.

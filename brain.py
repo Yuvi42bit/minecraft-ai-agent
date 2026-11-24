@@ -1,70 +1,118 @@
 import base64
-import os
 import re
 import requests
 from systemprompt import systemprompt
 from getxt import getxt
-api_key = None
-api_key=getxt("apikey.txt")
+
+api_key = getxt("apikey.txt")
 
 MODEL = "inclusionai/ling-3.0-flash-vl"
+reasoning = "low"  # "none" turns reasoning off; for this model every other level behaves the same
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-systemprompt = systemprompt
+MAX_PLANS = 3          # how many recent plans the model keeps seeing
+MAX_ACTION_MESSAGES = 2  # last user turn + last action reply
 
+ACTION_RE = re.compile(r"^\s*([A-Za-z_]\w*)\s*\(.*\)\s*$")
+
+
+def is_plan(text):
+    return str(text).strip().lower().startswith("plan:")
+
+
+def is_action(text):
+    text = str(text).strip()
+    return text.lower() in ("break", "break()") or bool(ACTION_RE.match(text))
+
+
+def clean_output(out):
+    """Strip code fences / backticks the model sometimes wraps answers in."""
+    out = str(out).strip()
+    out = re.sub(r"^```[a-zA-Z]*\s*", "", out)
+    out = re.sub(r"\s*```$", "", out)
+    return out.strip().strip("`").strip()
+
+
+def split_output(out):
+    """Return (plan, action). A reply can be a plan, an action, or a plan
+    whose last line is an action."""
+    out = clean_output(out)
+    lines = [line.strip().strip("`") for line in out.splitlines() if line.strip()]
+    if not lines:
+        return None, None
+
+    if is_plan(out):
+        if len(lines) > 1 and is_action(lines[-1]):
+            return "\n".join(lines[:-1]), lines[-1]
+        return out, None
+
+    # Not a plan: use the last line that looks like an action.
+    for line in reversed(lines):
+        if is_action(line):
+            return None, line
+    return None, None
 
 
 def trim_session(session):
-    updated_session = []
-    action_count = 0
-    for message in reversed(session):
-        if str(message["content"]).startswith("plan:"):
-            updated_session.append(message)
-        else:
-            if action_count < 2:
-                updated_session.append(message)
-                action_count += 1
-    new_session = list(reversed(updated_session))
-    return new_session
+    """Keep the system prompt, the last few plans, and the most recent turn."""
+    system = session[0]
+    rest = session[1:]
+
+    plans = [m for m in rest if m["role"] == "assistant" and is_plan(m["content"])]
+    others = [m for m in rest if not (m["role"] == "assistant" and is_plan(m["content"]))]
+
+    keep_plans = plans[-MAX_PLANS:]
+    keep_others = others[-MAX_ACTION_MESSAGES:]
+    keep_ids = {id(m) for m in keep_plans + keep_others}
+
+    # Preserve original ordering.
+    return [system] + [m for m in rest if id(m) in keep_ids]
+
+
 def brain(image_bytes, session, prompt, api_key=api_key):
-    # Initialize a new session if none is provided
+    """Returns (plan, action, session). plan/action may be None."""
     if session is None:
         session = [{"role": "system", "content": systemprompt}]
-    
+
     img = base64.b64encode(image_bytes).decode()
-    
-    # Append current turn
+
     session.append({
         "role": "user",
         "content": [
             {"type": "text", "text": prompt},
-            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img}"}}
-        ]
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img}"}},
+        ],
     })
-    
+
     try:
         response = requests.post(
             OPENROUTER_URL,
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://your-site.com", 
             },
-            json={"model": MODEL, "messages": session},
-            timeout=15 
+            json={"model": MODEL, "messages": session, "reasoning": {"effort": reasoning}},
+            timeout=30,
         )
         response.raise_for_status()
         data = response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"API Request failed: {e}")
-        # Remove the user message we just added so it doesn't break future calls
-        session.pop() 
-        return None, session
+        out = data["choices"][0]["message"]["content"] or ""
+    except (requests.exceptions.RequestException, KeyError, IndexError, ValueError) as e:
+        print(f"API request failed: {e}")
+        session.pop()  # drop the user turn we just added
+        return None, None, session
 
-    out = data["choices"][0]["message"]["content"]
+    plan, action = split_output(out)
+    if plan is None and action is None:
+        print("brain (unusable reply):", out)
 
-    session.append({"role": "assistant", "content": out})
+    # Store the plan and action as separate messages so trimming works.
+    if plan:
+        session.append({"role": "assistant", "content": plan})
+    if action:
+        session.append({"role": "assistant", "content": action})
+    if not plan and not action:
+        session.append({"role": "assistant", "content": out})
 
-    session=trim_session(session)
-
-    return out, session
+    session = trim_session(session)
+    return plan, action, session

@@ -2,16 +2,30 @@ import base64
 import os
 import re
 import requests
-from dotenv import load_dotenv
 from systemprompt import systemprompt
+
+try:
+    from dotenv import load_dotenv
+except ImportError:  # e.g. in the cloud, where there's no .env anyway
+    def load_dotenv(*args, **kwargs):
+        return False
 
 # Load OPENROUTER_API_KEY from the .env file next to this script
 # (a real environment variable with the same name takes priority).
+# In Claude Code cloud there is no key here: a network secret adds it to
+# requests to openrouter.ai automatically, so we send no Authorization header.
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 api_key = os.environ.get("OPENROUTER_API_KEY")
-if not api_key:
-    raise SystemExit("OPENROUTER_API_KEY is not set. Put OPENROUTER_API_KEY=your-key "
-                     "in a .env file in the project folder.")
+if not api_key and os.environ.get("CLAUDE_CODE_REMOTE") != "true":
+    print("Warning: OPENROUTER_API_KEY is not set. Put OPENROUTER_API_KEY=your-key "
+          "in a .env file in the project folder.")
+
+
+def _headers(key):
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    return headers
 
 MODEL = "inclusionai/ling-3.0-flash-vl"
 reasoning = "low"  # "none" turns reasoning off; for this model every other level behaves the same
@@ -94,10 +108,7 @@ def brain(image_bytes, session, prompt, api_key=api_key):
     try:
         response = requests.post(
             OPENROUTER_URL,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
+            headers=_headers(api_key),
             json={"model": MODEL, "messages": session, "reasoning": {"effort": reasoning}},
             timeout=30,
         )
